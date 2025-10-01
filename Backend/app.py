@@ -3,11 +3,16 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import sqlite3
 import pickle
+from transformers import pipeline
+import numpy as np  # For dot product
 
 app = FastAPI(title="Green Matchers API")
 
 # Load model (CPU-friendly, 384 dims)
 model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Load LLM (small, offline model—downloads ~500MB first time)
+generator = pipeline("text-generation", model="gpt2")
 
 DB_FILE = 'green_jobs.db'
 
@@ -17,6 +22,9 @@ class SkillInput(BaseModel):
 class JobInput(BaseModel):
     job_title: str
     job_description: str
+
+class QueryInput(BaseModel):
+    skill_text: str
 
 def get_db_connection():
     return sqlite3.connect(DB_FILE)
@@ -54,13 +62,6 @@ def add_job(job: JobInput):
         cursor.close()
         conn.close()
 
-if __name__ == "__main__":
-
-    import numpy as np  # For dot product (add this to the top imports if not there)
-
-class QueryInput(BaseModel):
-    skill_text: str
-
 @app.post("/match_jobs")
 def match_jobs(query: QueryInput):
     q_embedding = model.encode(query.skill_text)
@@ -86,5 +87,16 @@ def match_jobs(query: QueryInput):
     finally:
         cursor.close()
         conn.close()
-import uvicorn
-uvicorn.run(app, host="0.0.0.0", port=8000)
+
+@app.post("/generate_narrative")
+def generate_narrative(query: QueryInput):
+    prompt = f"Create a short, engaging story about how {query.skill_text} skills contribute to green jobs in sustainability:"
+    try:
+        narrative = generator(prompt, max_length=100, num_return_sequences=1, do_sample=True)[0]['generated_text']
+        return {"narrative": narrative.strip()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
