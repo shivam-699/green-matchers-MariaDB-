@@ -100,3 +100,26 @@ def generate_narrative(query: QueryInput):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1. Start the Backend (In First Terminal)
+
+# Navigate: cd Backend (capital B—prompt: ...green-matchers\Backend>).
+# Activate venv: ..\.venv\Scripts\Activate.ps1 (prompt gets (.venv)).
+# Run server: uvicorn app:app --reload
+
+# http://127.0.0.1:8000/docs
