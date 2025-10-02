@@ -90,7 +90,7 @@ def match_jobs(query: QueryInput):
 
 @app.post("/generate_narrative")
 def generate_narrative(query: QueryInput):
-    prompt = f"Create a short, engaging story about how {query.skill_text} skills contribute to green jobs in sustainability:"
+    prompt = f"In an inspiring tone, tell a 50-word story of how {query.skill_text} drives green jobs like renewable energy or waste reduction:"
     try:
         narrative = generator(prompt, max_length=100, num_return_sequences=1, do_sample=True)[0]['generated_text']
         return {"narrative": narrative.strip()}
