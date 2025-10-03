@@ -190,7 +190,7 @@ st.markdown(
 # Dynamic content
 t = translations[st.session_state.lang]
 st.markdown(f'<div class="stHeader">{t["title"]}</div>', unsafe_allow_html=True)
-st.markdown(f'<p class="stText" style="text-align:center;">{t["powered_by"]}</p>', unsafe_allow_html=True)
+st.markdown(f'<p class="stText" style="text-align:center;"></p>', unsafe_allow_html=True)
 
 # Skill input (multi-select with common skills)
 skills = st.multiselect(
@@ -238,4 +238,3 @@ st.markdown("""
   }
 </script>
 """, unsafe_allow_html=True)
-
