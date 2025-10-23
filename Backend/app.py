@@ -21,6 +21,7 @@ import os
 from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
+import asyncio
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +30,7 @@ logger = logging.getLogger(__name__)
 # Load environment
 load_dotenv()
 
-app = FastAPI(title="Green Matchers API", version="2.0.0")
+app = FastAPI(title="Green Matchers API v3.0", version="3.0.0")
 
 # ========================================
 # PRODUCTION SECURITY - CORS + RATE LIMIT
@@ -47,7 +48,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ========================================
-# ENHANCED IN-MEMORY DATABASE
+# ENHANCED IN-MEMORY DATABASE + SDG SCORES
 # ========================================
 fake_users_db = {
     "shivam": {"username": "shivam", "password": "hack2win", "role": "student", "email": "shivam@example.com"},
@@ -57,12 +58,71 @@ fake_users_db = {
 @lru_cache(maxsize=128)
 def get_cached_jobs():
     return [
-        {"id": 1, "job_title": "Eco Engineer", "description": "Build renewable energy systems using Python", "salary": "₹8-15 LPA", "location": "Bengaluru"},
-        {"id": 2, "job_title": "Green Developer", "description": "Develop sustainable web apps for waste management", "salary": "₹6-12 LPA", "location": "Mumbai"},
-        {"id": 3, "job_title": "Renewable Analyst", "description": "Analyze solar/wind energy data with AI/ML", "salary": "₹7-14 LPA", "location": "Delhi"},
-        {"id": 4, "job_title": "Sustainability Consultant", "description": "Advise companies on ESG compliance", "salary": "₹10-18 LPA", "location": "Pune"},
-        {"id": 5, "job_title": "Green Data Scientist", "description": "ML models for climate prediction", "salary": "₹9-16 LPA", "location": "Hyderabad"}
+        {
+            "id": 1,
+            "job_title": "Eco Engineer",
+            "description": "Build renewable energy systems using Python",
+            "salary": "₹8-15 LPA",
+            "location": "Bengaluru",
+            "company": "GreenTech Solutions",
+            "company_rating": "4.8⭐",
+            "sdg_impact": "SDG 8: 9/10 | Carbon Saved: 500 tons/year",
+            "urgency": "High Demand"
+        },
+        {
+            "id": 2,
+            "job_title": "Green Developer", 
+            "description": "Develop sustainable web apps for waste management",
+            "salary": "₹6-12 LPA",
+            "location": "Mumbai",
+            "company": "GreenTech Solutions",
+            "company_rating": "4.8⭐",
+            "sdg_impact": "SDG 11: 8/10 | Waste Reduced: 200 tons/year",
+            "urgency": "Apply Now!"
+        },
+        {
+            "id": 3,
+            "job_title": "Renewable Analyst",
+            "description": "Analyze solar/wind energy data with AI/ML",
+            "salary": "₹7-14 LPA",
+            "location": "Delhi",
+            "company": "GreenTech Solutions",
+            "company_rating": "4.8⭐",
+            "sdg_impact": "SDG 7: 9/10 | Energy Saved: 300 MWh/year",
+            "urgency": "High Demand"
+        },
+        {
+            "id": 4,
+            "job_title": "Sustainability Consultant",
+            "description": "Advise companies on ESG compliance",
+            "salary": "₹10-18 LPA",
+            "location": "Pune",
+            "company": "GreenTech Solutions",
+            "company_rating": "4.8⭐",
+            "sdg_impact": "SDG 12: 9/10 | Compliance Score: 95%",
+            "urgency": "Immediate"
+        },
+        {
+            "id": 5,
+            "job_title": "Green Data Scientist",
+            "description": "ML models for climate prediction",
+            "salary": "₹9-16 LPA",
+            "location": "Hyderabad",
+            "company": "GreenTech Solutions",
+            "company_rating": "4.8⭐",
+            "sdg_impact": "SDG 13: 10/10 | Predictions: 98% accurate",
+            "urgency": "High Demand"
+        }
     ]
+
+# Hindi Job Titles (Multi-Language)
+HINDI_JOBS = {
+    1: "इको इंजीनियर",
+    2: "ग्रीन डेवलपर", 
+    3: "नवीकरणीय विश्लेषक",
+    4: "सस्टेनेबिलिटी कंसल्टेंट",
+    5: "ग्रीन डेटा साइंटिस्ट"
+}
 
 # Supported languages
 SUPPORTED_LANGUAGES = {
@@ -84,7 +144,7 @@ generator = None
 sd_pipe = None
 
 # ========================================
-# ENHANCED PYDANTIC MODELS (VALIDATION)
+# ENHANCED PYDANTIC MODELS
 # ========================================
 class SkillInput(BaseModel):
     skill_text: str
@@ -104,6 +164,14 @@ class JobInput(BaseModel):
 class QueryInput(BaseModel):
     skill_text: List[str]
     lang: str = "en"
+
+class ApplyInput(BaseModel):
+    job_id: int
+    cover_letter: str = ""
+
+class CareerPathInput(BaseModel):
+    current_skill: str
+    years_experience: int = 5
 
 # ========================================
 # JWT + AUTH FUNCTIONS
@@ -136,6 +204,15 @@ def translate_text_cached(text: str, target_lang: str = "en"):
     except:
         return text
 
+# AI Skill Recommender
+def recommend_skills(current_skill: str):
+    recommendations = {
+        "python": ["Solar Panel Design", "Wind Energy Analysis", "Carbon Footprint ML"],
+        "design": ["Sustainable Architecture", "Green Material Science", "ESG Reporting"],
+        "data": ["Climate Modeling", "Renewable Forecasting", "Sustainability Analytics"]
+    }
+    return recommendations.get(current_skill.lower(), ["Renewable Energy Basics"])
+
 # Load AI Models
 def load_models():
     global model, generator, sd_pipe
@@ -148,7 +225,7 @@ def load_models():
 
 # BYPASS DATABASE
 def init_db():
-    print("✅ PRODUCTION DATABASE: In-Memory + Cached")
+    print("✅ PRODUCTION DATABASE v3.0: In-Memory + SDG Scores + Multi-Language")
     load_models()
     return True
 
@@ -177,21 +254,22 @@ def send_email(to_email: str, subject: str, body: str):
         msg['Subject'] = subject
         msg['From'] = "noreply@greenmatchers.com"
         msg['To'] = to_email
-        # For demo - print instead of send
         print(f"📧 EMAIL SENT TO {to_email}: {subject}")
+        print(f"📧 CONTENT: {body[:100]}...")
         return True
     except:
         return False
 
 # ========================================
-# PRODUCTION ENDPOINTS
+# PRODUCTION ENDPOINTS v3.0
 # ========================================
 
 @app.get("/health")
 def health_check():
     return {
         "status": "healthy", 
-        "version": "2.0.0",
+        "version": "3.0.0",
+        "features": ["SDG Scores", "Real-time Alerts", "Career Path", "Multi-Language"],
         "timestamp": datetime.utcnow().isoformat(),
         "uptime": time.time()
     }
@@ -202,7 +280,9 @@ def get_stats():
         "total_jobs": len(get_cached_jobs()),
         "users": len(fake_users_db),
         "languages": len(SUPPORTED_LANGUAGES),
-        "uptime": f"{time.time():.0f}s"
+        "sdg_goals": 7,
+        "uptime": f"{time.time():.0f}s",
+        "alerts_active": len(manager.active_connections)
     }
 
 @app.post("/token")
@@ -222,7 +302,7 @@ async def match_jobs(request: Request, query: QueryInput, current_user: dict = D
     jobs = get_cached_jobs()
     skill_text = " ".join(query.skill_text).lower()
     
-    # ENHANCED SMART MATCHING
+    # ENHANCED SMART MATCHING + SDG
     matches = []
     for job in jobs:
         similarity = 0.70
@@ -233,33 +313,43 @@ async def match_jobs(request: Request, query: QueryInput, current_user: dict = D
         elif "consult" in skill_text:
             similarity = 0.85
             
+        # MULTI-LANGUAGE SUPPORT
+        job_title = job["job_title"]
+        description = job["description"]
+        if query.lang == "hi":
+            job_title = HINDI_JOBS.get(job["id"], job_title)
+            description = translate_text_cached(description, "hi")
+        
         matches.append({
             "id": job["id"],
-            "job_title": job["job_title"],
-            "description": job["description"],
+            "job_title": job_title,
+            "description": description,
             "salary_range": job["salary"],
             "location": job["location"],
-            "company": "GreenTech Solutions",
+            "company": job["company"],
+            "company_rating": job["company_rating"],
+            "sdg_impact": job["sdg_impact"],
+            "urgency": job["urgency"],
             "similarity": round(similarity, 2),
             "apply_url": f"https://greenmatchers.com/jobs/{job['id']}"
         })
     
     matches = sorted(matches, key=lambda x: x["similarity"], reverse=True)
     
-    # PERFORMANCE METRICS
+    # PERFORMANCE + NOTIFICATIONS
     response_time = time.time() - start_time
     
-    # NOTIFICATIONS
-    await manager.broadcast(f"🚀 {current_user['username']}: {len(matches)} job matches!")
-    send_email(current_user["email"], "New Job Matches!", f"Found {len(matches)} green jobs for your skills!")
+    # REAL-TIME ALERTS
+    await manager.broadcast(f"🚨 {current_user['username']}: {len(matches)} NEW JOBS!")
+    send_email(current_user["email"], "🚨 NEW GREEN JOBS!", f"Found {len(matches)} matches for {skill_text}!")
     
     logger.info(f"🚀 {current_user['username']} - {len(matches)} jobs in {response_time:.2f}s")
     
     return {
         "matches": matches[:5],
         "suggestions": [
-            {"skill": "Renewable Energy Certification", "link": "https://coursera.org"},
-            {"skill": "Python for Sustainability", "link": "https://udemy.com"}
+            {"skill": recommend_skills(skill_text)[0], "link": "https://coursera.org"},
+            {"skill": recommend_skills(skill_text)[1] if len(recommend_skills(skill_text)) > 1 else "ESG Basics", "link": "https://udemy.com"}
         ],
         "response_time": f"{response_time:.2f}s",
         "total_jobs": len(matches),
@@ -268,11 +358,11 @@ async def match_jobs(request: Request, query: QueryInput, current_user: dict = D
 
 @app.post("/generate_narrative")
 @limiter.limit("5/minute")
-def generate_narrative(request: Request, query: QueryInput, current_user: dict = Depends(get_current_user)):
+async def generate_narrative(request: Request, query: QueryInput, current_user: dict = Depends(get_current_user)):
     start_time = time.time()
     skill_text = ", ".join(query.skill_text)
     
-    prompt = f"Inspiring 50-word career story: How {skill_text} creates impact in green jobs, renewable energy, sustainability"
+    prompt = f"Inspiring 50-word career story: How {skill_text} creates SDG impact in green jobs, renewable energy, sustainability"
     
     result = generator(prompt, max_length=150, num_return_sequences=1, do_sample=True, temperature=0.8)
     narrative = result[0]['generated_text'].strip()[:250]
@@ -291,10 +381,10 @@ def generate_narrative(request: Request, query: QueryInput, current_user: dict =
 
 @app.post("/generate_career_visual")
 @limiter.limit("2/minute")
-def generate_career_visual(request: Request, query: QueryInput, current_user: dict = Depends(get_current_user)):
+async def generate_career_visual(request: Request, query: QueryInput, current_user: dict = Depends(get_current_user)):
     start_time = time.time()
     skill_text = ", ".join(query.skill_text)
-    prompt = f"Vibrant career infographic: {skill_text} in green jobs, renewable energy, sustainability, professional, colorful"
+    prompt = f"Vibrant career infographic: {skill_text} in green jobs, SDG impact, renewable energy, professional, colorful"
     
     try:
         image = sd_pipe(prompt, num_inference_steps=20).images[0]
@@ -313,11 +403,77 @@ def generate_career_visual(request: Request, query: QueryInput, current_user: di
             "response_time": "0.01s"
         }
 
+@app.post("/subscribe_alerts")
+async def subscribe_alerts(request: Request, skills: List[str], current_user: dict = Depends(get_current_user)):
+    # NEW JOB ALERT
+    new_job = {
+        "title": "Solar Engineer (NEW!)",
+        "salary": "₹12-20 LPA", 
+        "location": "Chennai",
+        "urgency": "Apply in 24h!",
+        "sdg_impact": "SDG 7: 10/10 | Energy: 400 MWh/year"
+    }
+    
+    # REAL-TIME PUSH
+    await manager.broadcast(f"🚨 NEW JOB for {current_user['username']}: {new_job['title']} - {new_job['salary']}")
+    
+    # EMAIL
+    send_email(current_user["email"], "🚨 NEW GREEN JOB ALERT!", 
+               f"{new_job['title']}\nSalary: {new_job['salary']}\nLocation: {new_job['location']}")
+    
+    return {
+        "message": "Subscribed! Real-time alerts ACTIVE",
+        "new_job": new_job,
+        "delivery": "WebSocket + Email",
+        "status": "success"
+    }
+
+@app.post("/apply_job")
+async def apply_job(apply_data: ApplyInput, current_user: dict = Depends(get_current_user)):
+    job = next((j for j in get_cached_jobs() if j["id"] == apply_data.job_id), None)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Simulate application tracking
+    application_id = f"APP_{int(time.time())}"
+    
+    await manager.broadcast(f"📝 {current_user['username']} APPLIED for {job['job_title']}")
+    
+    return {
+        "application_id": application_id,
+        "job_title": job["job_title"],
+        "status": "Applied",
+        "next_step": "Interview Scheduled in 3 days",
+        "message": "Application submitted successfully!"
+    }
+
+@app.post("/career_path")
+async def career_path(career_data: CareerPathInput, current_user: dict = Depends(get_current_user)):
+    current = career_data.current_skill
+    years = career_data.years_experience
+    
+    paths = {
+        "python": [f"Junior Eco Engineer (0-2y)", f"Senior Green Developer (2-5y)", f"CTO Sustainability (5+ y)"],
+        "design": [f"Junior Designer (0-2y)", f"Lead Architect (2-5y)", f"Head of Green Design (5+ y)"],
+        "data": [f"Junior Analyst (0-2y)", f"Senior Data Scientist (2-5y)", f"Chief Climate Officer (5+ y)"]
+    }
+    
+    path = paths.get(current.lower(), ["Green Specialist", "Senior Expert", "Director"])
+    
+    return {
+        "current_skill": current,
+        "years": years,
+        "career_path": path[:3],
+        "salary_projection": f"₹{8 + years*2}-{15 + years*3} LPA",
+        "sdg_impact": "Maximum contribution to 7 SDGs"
+    }
+
 @app.post("/add_skill")
 def add_skill(skill: SkillInput, current_user: dict = Depends(get_current_user)):
     return {
         "message": "Skill added successfully",
         "skill": skill.skill_text,
+        "recommended_next": recommend_skills(skill.skill_text),
         "user": current_user["username"]
     }
 
@@ -328,21 +484,29 @@ def add_job(job: JobInput, current_user: dict = Depends(get_current_user)):
     return {
         "message": "Job posted successfully",
         "job_title": job.job_title,
-        "employer": current_user["username"]
+        "employer": current_user["username"],
+        "sdg_impact": "Added to database"
     }
 
 @app.get("/export_jobs")
 def export_jobs(current_user: dict = Depends(get_current_user)):
     jobs = get_cached_jobs()
-    csv_content = "Job Title,Description,Salary,Location\n"
+    csv_content = "Job Title,Salary,Location,SDG Impact,Company Rating\n"
     for job in jobs:
-        csv_content += f"{job['job_title']},{job['description']},{job['salary']},{job['location']}\n"
-    return {"csv": csv_content, "download": "jobs.csv"}
+        csv_content += f"{job['job_title']},{job['salary']},{job['location']},{job['sdg_impact']},{job['company_rating']}\n"
+    return {"csv": csv_content, "download": "green_jobs.csv", "total": len(jobs)}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
-    await websocket.send_text("✅ Connected to Green Matchers - Real-time Updates!")
+    await websocket.send_text("🚀 Welcome to Green Matchers v3.0 - Real-time Alerts ACTIVE!")
+    
+    # SIMULATE LIVE JOB ALERTS
+    await asyncio.sleep(2)
+    await websocket.send_text('🚨 NEW: "Wind Turbine Developer" - ₹10-18 LPA - Chennai - Apply NOW!')
+    await asyncio.sleep(3)
+    await websocket.send_text('🚨 URGENT: "Carbon Analyst" - ₹9-15 LPA - Kolkata - 24h left!')
+    
     try:
         while True:
             data = await websocket.receive_text()
