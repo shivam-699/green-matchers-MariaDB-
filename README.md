@@ -9,3 +9,9 @@
 - Enhanced auto-geolocation with ipinfo.io API.
 - Added /generate_cover_letter endpoint.
 - Tested: All endpoints functional.
+
+
+
+
+- Added /dashboard for real-time job market predictions with AI.
+- Added /simulate_impact for user CO2 savings simulation.
