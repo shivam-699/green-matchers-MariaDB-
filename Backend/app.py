@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+import numpy as np
 from fastapi.responses import StreamingResponse
 import requests
 from deep_translator import GoogleTranslator
@@ -175,9 +178,27 @@ class CareerPathInput(BaseModel):
     current_skill: str
     years_experience: int = 5
 
+def train_salary_predictor():
+    data = np.array([[8, 9], [6, 7], [7, 8], [10, 11]])
+    X, y = data[:, 0:1], data[:, 1]
+    model = Sequential()
+    model.add(LSTM(50, activation='relu', input_shape=(1, 1)))
+    model.add(Dense(1))
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(X.reshape((4, 1, 1)), y, epochs=100, verbose=0)
+    return model
+
+
+class ImpactInput(BaseModel):
+    role: str
+    hours_per_week: int
+    duration_months: int
+
+salary_model = train_salary_predictor()
+
 # ========================================
 # FIXED get_cached_jobs FUNCTION
-# ========================================
+# =====================================
 
 @lru_cache(maxsize=128)
 def translate_text_cached(text, lang):
@@ -248,7 +269,10 @@ def load_models():
 def init_db():
     print("✅ PRODUCTION DATABASE v3.3: In-Memory + REAL COMPANIES + SDG Scores + Multi-Language + Trends")
     load_models()
+    global salary_model
+    salary_model = train_salary_predictor()  # Initialize here
     return True
+
 
 # Enhanced Auto-Geolocation using ipinfo.io (v3.3)
 def get_city_from_ip(ip):
@@ -344,6 +368,13 @@ async def job_trends():
             }
         }
     }
+
+@app.get("/dashboard")
+async def dashboard():
+    predictions = salary_model.predict(np.array([[10]]).reshape((1, 1, 1)))
+    chart_data = [8, 9, 7, 11, float(predictions[0][0])]  # Convert to float
+    return {"chart": {"type": "line", "data": {"labels": ["Jan", "Feb", "Mar", "Apr", "Future"], "datasets": [{"data": chart_data, "backgroundColor": "#36A2EB"}]}}}
+
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -478,6 +509,25 @@ async def career_path(career_data: CareerPathInput, current_user: dict = Depends
 async def generate_cover_letter(query: QueryInput, current_user: dict = Depends(get_current_user)):
     cover_letter = f"Dear Hiring Manager,\nI am excited to apply for the {query.skill_text[0]} role at {next(iter(company_websites))}. With my experience in {query.skill_text[0]}, I can contribute to your green initiatives.\nBest,\n{current_user['username']}"
     return {"cover_letter": cover_letter, "user": current_user["username"]}
+
+@app.post("/simulate_impact")
+async def simulate_impact(input: ImpactInput, current_user: dict = Depends(get_current_user)):
+    impact_per_hour = {"Eco Engineer": 0.5, "Green Developer": 0.3, "Renewable Analyst": 0.4}  # Tons CO2 saved per hour
+    total_impact = (impact_per_hour.get(input.role, 0.1) * input.hours_per_week * (input.duration_months * 4)) / 1000  # Convert to tons
+    return {
+        "chart": {
+            "type": "pie",
+            "data": {
+                "labels": ["CO2 Saved", "Remaining Impact"],
+                "datasets": [{
+                    "data": [total_impact, 1 - total_impact],
+                    "backgroundColor": ["#4BC0C0", "#FFCE56"]
+                }]
+            }
+        },
+        "total_impact_tons": f"{total_impact:.2f} tons",
+        "user": current_user["username"]
+    }
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
