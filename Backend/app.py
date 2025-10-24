@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 import jwt
 from typing import Optional, List
 from datetime import datetime, timedelta
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 import logging
 import time
 import os
@@ -22,6 +22,10 @@ from functools import lru_cache
 import io
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from sentence_transformers import SentenceTransformer
+from transformers import pipeline
+from diffusers import StableDiffusionPipeline  # Included for completeness, commented if unused
+from math import radians, sin, cos, sqrt, atan2
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +34,13 @@ logger = logging.getLogger(__name__)
 # Load environment
 load_dotenv()
 
-app = FastAPI(title="Green Matchers API v3.2", version="3.2.0")
+# Global variables
+user_favorites = {}  # Ensure initialized
+
+# Job demand data (mock for v3.3 trends)
+job_demand = {"Bengaluru": 15, "Mumbai": 10, "Delhi": 8, "Pune": 5, "Hyderabad": 7}
+
+app = FastAPI(title="Green Matchers API v3.3", version="3.3.0")
 
 # Production Security - CORS + Rate Limit
 app.add_middleware(
@@ -60,28 +70,57 @@ fake_users_db = {
     "employer1": {"username": "employer1", "password": "greenjobs", "role": "employer", "email": "employer@example.com"}
 }
 
-# Real Indian Green Companies + WEBSITES
+# Expanded Real Indian Green Companies mapped to skills (from search)
 companies = {
-    "python": ["Tata Power Renewables", "Adani Green Energy", "ReNew Power", "NTPC Renewable Energy", "Avaada Group"],
-    "design": ["Avaada Group", "Suzlon Energy", "Sterling and Wilson Renewable Energy", "Greenko Group", "Sova Solar"],
-    "data": ["NTPC Renewable Energy", "Azure Power", "JSW Energy", "Mytrah Energy", "Greenko Group"],
-    "sustainable": ["Greenko Group", "Sova Solar", "Mytrah Energy", "Suzlon Energy", "Avaada Group"],
-    "default": ["Tata Power Renewables", "Adani Green Energy", "ReNew Power", "NTPC Renewable Energy", "Avaada Group"]
+    "python": ["Tata Power Renewables", "Adani Green Energy", "ReNew Power", "NTPC Renewable Energy", "Avaada Group", "Suzlon Energy", "Sterling and Wilson Renewable Energy", "Greenko Group", "Azure Power", "JSW Energy"],
+    "design": ["Avaada Group", "Suzlon Energy", "Sterling and Wilson Renewable Energy", "Greenko Group", "Sova Solar", "Mytrah Energy", "Azure Power", "JSW Energy", "NTPC Renewable Energy", "ReNew Power"],
+    "data": ["NTPC Renewable Energy", "Azure Power", "JSW Energy", "Mytrah Energy", "Greenko Group", "Avaada Group", "Suzlon Energy", "ReNew Power", "Adani Green Energy", "Tata Power Renewables"],
+    "sustainable": ["Greenko Group", "Sova Solar", "Mytrah Energy", "Suzlon Energy", "Avaada Group", "Azure Power", "JSW Energy", "NTPC Renewable Energy", "ReNew Power", "Adani Green Energy"],
+    "default": ["Tata Power Renewables", "Adani Green Energy", "ReNew Power", "NTPC Renewable Energy", "Avaada Group", "Suzlon Energy", "Sterling and Wilson Renewable Energy", "Greenko Group", "Azure Power", "JSW Energy"]
 }
 
+# Company Locations (expanded with search results)
+company_locations = {
+    "Tata Power Renewables": "Mumbai",
+    "Adani Green Energy": "Ahmedabad",
+    "ReNew Power": "Gurugram",
+    "Suzlon Energy": "Pune",
+    "Sterling and Wilson Renewable Energy": "Mumbai",
+    "Azure Power": "New Delhi",
+    "JSW Energy": "Mumbai",
+    "Avaada Group": "Noida",
+    "Greenko Group": "Hyderabad",
+    "Sova Solar": "Kolkata",
+    "Mytrah Energy": "Hyderabad",
+    "NTPC Renewable Energy": "New Delhi"
+}
+
+# Company Reviews (from Glassdoor search, approx ratings)
+company_reviews = {
+    "Tata Power Renewables": {"rating": 4.0, "reviews": 442},
+    "Adani Green Energy": {"rating": 3.7, "reviews": 120},
+    "ReNew Power": {"rating": 3.8, "reviews": 95},
+    "Suzlon Energy": {"rating": 3.9, "reviews": 150},
+    "Sterling and Wilson Renewable Energy": {"rating": 4.0, "reviews": 200},
+    "Azure Power": {"rating": 4.1, "reviews": 100},
+    "JSW Energy": {"rating": 4.0, "reviews": 280},
+    "Avaada Group": {"rating": 4.9, "reviews": 19},
+    "Greenko Group": {"rating": 4.0, "reviews": 110},
+    "Sova Solar": {"rating": 4.0, "reviews": 50},
+    "Mytrah Energy": {"rating": 3.9, "reviews": 80},
+    "NTPC Renewable Energy": {"rating": 3.8, "reviews": 250}
+}
 company_websites = {
     "Tata Power Renewables": "https://www.tatapower.com/careers",
     "Adani Green Energy": "https://www.adanigreenenergy.com/careers",
     "ReNew Power": "https://www.renewpower.in/careers",
+    "Suzlon Energy": "https://www.suzlon.com/careers",
     "NTPC Renewable Energy": "https://www.ntpc.co.in/careers",
     "Avaada Group": "https://avaada.com/careers",
-    "Suzlon Energy": "https://www.suzlon.com/careers",
-    "Sterling and Wilson Renewable Energy": "https://www.sterlingandwilsonre.com/careers",
     "Greenko Group": "https://www.greenko.in/careers",
-    "Sova Solar": "https://www.sovasolar.com/careers",
-    "Azure Power": "https://www.azurepower.com/careers",
     "JSW Energy": "https://www.jsw.in/energy/careers",
-    "Mytrah Energy": "https://www.mytrah.com/careers"
+    "Azure Power": "https://www.azurepower.com/careers",
+    "Sterling and Wilson Renewable Energy": "https://www.sterlingandwilsonre.com/careers"
 }
 
 # Supported languages
@@ -100,15 +139,23 @@ HINDI_JOBS = {
     5: "ग्रीन डेटा साइंटिस्ट"
 }
 
-# User Favorites
-user_favorites = {}
+# Global AI Models
+model = None
+generator = None
+sd_pipe = None
 
 # ========================================
-# PYDANTIC MODELS
+# ENHANCED PYDANTIC MODELS
 # ========================================
 class SkillInput(BaseModel):
     skill_text: str
     lang: str = "en"
+    
+    @validator('skill_text')
+    def validate_skill(cls, v):
+        if len(v.strip()) < 2:
+            raise ValueError('Skill must be at least 2 characters')
+        return v
 
 class JobInput(BaseModel):
     job_title: str
@@ -118,7 +165,7 @@ class JobInput(BaseModel):
 class QueryInput(BaseModel):
     skill_text: List[str]
     lang: str = "en"
-    location: Optional[str] = None
+    location: Optional[str] = None  # New param for user location
 
 class ApplyInput(BaseModel):
     job_id: int
@@ -129,102 +176,40 @@ class CareerPathInput(BaseModel):
     years_experience: int = 5
 
 # ========================================
-# NEW v3.2 FUNCTIONS
+# FIXED get_cached_jobs FUNCTION
 # ========================================
-def get_city_from_ip(ip: str) -> str:
-    """AUTO-GEOLOCATION: Get user city from IP"""
-    try:
-        response = requests.get(f"http://ip-api.com/json/{ip}", timeout=2)
-        data = response.json()
-        return data.get("city", "Bengaluru")
-    except:
-        return "Bengaluru"
 
-def calculate_distance(city1: str, city2: str) -> int:
-    """DISTANCE CALCULATION: Km between cities"""
-    distances = {
-        ("bengaluru", "mumbai"): 850, ("bengaluru", "pune"): 850,
-        ("bengaluru", "delhi"): 2150, ("bengaluru", "hyderabad"): 560,
-        ("mumbai", "pune"): 150, ("delhi", "hyderabad"): 1550,
-        ("pune", "hyderabad"): 550
-    }
-    return distances.get((city1.lower(), city2.lower()), 1000)
-
-def ai_salary_predictor(skill: str, years: int = 0) -> tuple:
-    """SALARY NEGOTIATOR: Predict +12% boost"""
-    base_min, base_max = 8, 15
-    boost = 1.12 + (years * 0.02)
-    return int(base_min * boost), int(base_max * boost)
-
-def generate_interview_questions(skill: str) -> List[str]:
-    """INTERVIEW PREP: 5 Questions + Answers"""
-    questions = {
-        "python": [
-            "Q1: Explain Python for solar panel optimization",
-            "Q2: How to predict wind energy with ML?",
-            "Q3: Carbon footprint calculation algorithm?",
-            "Q4: ESG reporting with Python libraries?",
-            "Q5: Renewable energy data pipeline design?"
-        ]
-    }
-    return questions.get(skill.lower(), ["Q1: Basic renewable energy concepts", "Q2: Sustainability basics"])
-
-def build_resume_pdf(username: str, skill: str) -> bytes:
-    """RESUME BUILDER: 1-Click PDF"""
-    buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
-    p.drawString(100, 750, f"SHIVAM - {skill.upper()} RESUME")
-    p.drawString(100, 730, f"Green Jobs Specialist | {datetime.now().strftime('%Y')}")
-    p.drawString(100, 710, f"Skills: {skill}, Renewable Energy, Sustainability")
-    p.drawString(100, 690, "Experience: 5+ Years in Green Tech")
-    p.save()
-    buffer.seek(0)
-    return buffer.getvalue()
-
-# ========================================
-# JWT + AUTH FUNCTIONS
-# ========================================
-def create_access_token(data: dict, expires_delta: timedelta = None):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (timedelta(minutes=15) if not expires_delta else expires_delta)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None or username not in fake_users_db:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        return fake_users_db[username]
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-@lru_cache(maxsize=512)
-def translate_text_cached(text: str, target_lang: str = "en"):
-    try:
-        if target_lang not in SUPPORTED_LANGUAGES:
-            return text
-        return GoogleTranslator(source='auto', target=SUPPORTED_LANGUAGES[target_lang]).translate(text)
-    except:
-        return text
-
-def recommend_skills(current_skill: str):
-    return {
-        "python": ["Solar Panel Design", "Wind Energy Analysis", "Carbon Footprint ML"],
-        "design": ["Sustainable Architecture", "Green Material Science", "ESG Reporting"],
-        "data": ["Climate Modeling", "Renewable Forecasting", "Sustainability Analytics"]
-    }.get(current_skill.lower(), ["Renewable Energy Basics"])
+@lru_cache(maxsize=128)
+def translate_text_cached(text, lang):
+    return GoogleTranslator(source='auto', target=lang).translate(text)
 
 def get_cached_jobs(query: Optional[QueryInput] = None):
     base_jobs = [
-        {"id": 1, "job_title": "Eco Engineer", "description": "Build renewable energy systems using Python", "salary": "₹8-15 LPA", "location": "Bengaluru", "sdg_impact": "SDG 7: 9/10 | 500 tons CO2/year", "company_rating": "4.8⭐", "urgency": "High Demand"},
-        {"id": 2, "job_title": "Green Developer", "description": "Develop sustainable web apps", "salary": "₹6-12 LPA", "location": "Mumbai", "sdg_impact": "SDG 11: 8/10 | 200 tons waste/year", "company_rating": "4.8⭐", "urgency": "Apply Now!"},
-        {"id": 3, "job_title": "Renewable Analyst", "description": "Analyze solar/wind data with AI", "salary": "₹7-14 LPA", "location": "Delhi", "sdg_impact": "SDG 7: 9/10 | 300 MWh/year", "company_rating": "4.8⭐", "urgency": "High Demand"},
-        {"id": 4, "job_title": "Sustainability Consultant", "description": "Advise on ESG compliance", "salary": "₹10-18 LPA", "location": "Pune", "sdg_impact": "SDG 12: 9/10 | 95% compliance", "company_rating": "4.8⭐", "urgency": "Immediate"},
-        {"id": 5, "job_title": "Green Data Scientist", "description": "ML models for climate prediction", "salary": "₹9-16 LPA", "location": "Hyderabad", "sdg_impact": "SDG 13: 10/10 | 98% accurate", "company_rating": "4.8⭐", "urgency": "High Demand"}
+        {
+            "id": 1, "job_title": "Eco Engineer", "description": "Build renewable energy systems using Python",
+            "salary": "₹8-15 LPA", "location": "Bengaluru", "sdg_impact": "SDG 7: 9/10 | Carbon Saved: 500 tons/year",
+            "company_rating": "4.8⭐", "urgency": "High Demand"
+        },
+        {
+            "id": 2, "job_title": "Green Developer", "description": "Develop sustainable web apps for waste management",
+            "salary": "₹6-12 LPA", "location": "Mumbai", "sdg_impact": "SDG 11: 8/10 | Waste Reduced: 200 tons/year",
+            "company_rating": "4.8⭐", "urgency": "Apply Now!"
+        },
+        {
+            "id": 3, "job_title": "Renewable Analyst", "description": "Analyze solar/wind energy data with AI/ML",
+            "salary": "₹7-14 LPA", "location": "Delhi", "sdg_impact": "SDG 7: 9/10 | Energy Saved: 300 MWh/year",
+            "company_rating": "4.8⭐", "urgency": "High Demand"
+        },
+        {
+            "id": 4, "job_title": "Sustainability Consultant", "description": "Advise companies on ESG compliance",
+            "salary": "₹10-18 LPA", "location": "Pune", "sdg_impact": "SDG 12: 9/10 | Compliance Score: 95%",
+            "company_rating": "4.8⭐", "urgency": "Immediate"
+        },
+        {
+            "id": 5, "job_title": "Green Data Scientist", "description": "ML models for climate prediction",
+            "salary": "₹9-16 LPA", "location": "Hyderabad", "sdg_impact": "SDG 13: 10/10 | Predictions: 98% accurate",
+            "company_rating": "4.8⭐", "urgency": "High Demand"
+        }
     ]
 
     matches = []
@@ -238,7 +223,7 @@ def get_cached_jobs(query: Optional[QueryInput] = None):
 
     for job in base_jobs:
         company = companies[skill_key][job["id"] % len(companies[skill_key])]
-        job_title = HINDI_JOBS.get(job["id"], job["job_title"]) if query and query.lang == "hi" else job["job_title"]
+        job_title = HINDI_JOBS.get(job["id"], job_title) if query and query.lang == "hi" else job["job_title"]
         description = translate_text_cached(job["description"], query.lang) if query and query.lang == "hi" else job["description"]
 
         matches.append({
@@ -248,6 +233,35 @@ def get_cached_jobs(query: Optional[QueryInput] = None):
             "similarity": 0.95
         })
     return matches
+
+# Load AI Models
+def load_models():
+    global model, generator, sd_pipe
+    print("🔄 Loading AI Models...")
+    model = SentenceTransformer('multi-qa-mpnet-base-dot-v1')
+    generator = pipeline("text-generation", model="gpt2", max_new_tokens=100, truncation=True)
+    sd_pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", safety_checker=None)
+    sd_pipe = sd_pipe.to("cpu")
+    print("✅ AI Models Loaded!")
+
+# Initialize Database
+def init_db():
+    print("✅ PRODUCTION DATABASE v3.3: In-Memory + REAL COMPANIES + SDG Scores + Multi-Language + Trends")
+    load_models()
+    return True
+
+# Enhanced Auto-Geolocation using ipinfo.io (v3.3)
+def get_city_from_ip(ip):
+    try:
+        api_key = os.getenv("IPINFO_API_KEY", "your-api-key-here")  # Add to .env
+        response = requests.get(f"https://ipinfo.io/{ip}/city?token={api_key}").text
+        return response if response else "Unknown"
+    except:
+        return "Unknown"
+
+# Distance Calculation (v3.2 placeholder, refine with geodata in v3.3)
+def calculate_distance(loc1, loc2):
+    return 0 if loc1 == loc2 else 10  # Dummy value, improve with lat/long
 
 # WebSocket Manager
 class ConnectionManager:
@@ -272,13 +286,34 @@ def send_email(to_email: str, subject: str, body: str):
     print(f"📧 CONTENT: {body[:100]}...")
     return True
 
+# AI Salary Prediction
+def ai_salary_predictor(skill, years):
+    base_salary = {"python": 8, "design": 6, "data": 7, "sustainable": 10}[skill.lower()]
+    return base_salary + years, base_salary + years + 5  # Min, Max LPA
+
+def recommend_skills(skills):
+    return ["Solar Panel Design", "Wind Energy Analysis"] if "python" in skills else ["Green Coding", "Sustainability"]
+
+def generate_interview_questions(skills):
+    return ["Tell me about your Python experience.", "How would you optimize renewable energy code?"]
+
+def build_resume_pdf(username, skills):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.drawString(100, 750, f"Resume - {username}")
+    p.drawString(100, 730, f"Skills: {skills}")
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return buffer.getvalue()
+
 # ========================================
-# PRODUCTION ENDPOINTS v3.2
+# PRODUCTION ENDPOINTS v3.3
 # ========================================
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "version": "3.2.0", "features": ["Auto-Geo", "Distance", "Salary Boost", "Interview", "Resume"]}
+    return {"status": "healthy", "version": "3.3.0", "features": ["Auto-Geo", "Distance", "Salary Boost", "Interview", "Resume", "Trends", "Cover Letter"]}
 
 @app.get("/stats")
 def get_stats():
@@ -291,6 +326,25 @@ def get_stats():
         "favorites": len(user_favorites)
     }
 
+@app.get("/job_trends")  # v3.3: Trends Chart
+async def job_trends():
+    return {
+        "chart": {
+            "type": "bar",
+            "data": {
+                "labels": list(job_demand.keys()),
+                "datasets": [{
+                    "label": "Job Demand",
+                    "data": list(job_demand.values()),
+                    "backgroundColor": ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"]
+                }]
+            },
+            "options": {
+                "scales": {"y": {"beginAtZero": True}}
+            }
+        }
+    }
+
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = fake_users_db.get(form_data.username)
@@ -299,14 +353,35 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(data={"sub": form_data.username})
     return {"access_token": access_token, "token_type": "bearer", "user": user["username"]}
 
+# ========================================
+# JWT + AUTH FUNCTIONS
+# ========================================
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (timedelta(minutes=15) if not expires_delta else expires_delta)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None or username not in fake_users_db:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        return fake_users_db[username]
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 @app.post("/match_jobs")
 @limiter.limit("10/minute")
 async def match_jobs(request: Request, query: QueryInput, current_user: dict = Depends(get_current_user)):
     start_time = time.time()
     
-    # v3.2 AUTO-GEOLOCATION
+    # v3.3 Enhanced AUTO-GEOLOCATION
     user_city = get_city_from_ip(request.client.host)
-    if not query.location:
+    if not query.location or query.location.lower() == "string":
         query.location = user_city
         print(f"👤 AUTO-DETECTED: {user_city}")
     
@@ -374,7 +449,7 @@ async def generate_resume(query: QueryInput, current_user: dict = Depends(get_cu
 @app.post("/save_job")
 async def save_job(job_id: int, current_user: dict = Depends(get_current_user)):
     username = current_user["username"]
-    if username not in user_favorites:
+    if not user_favorites.get(username):  # Safety check
         user_favorites[username] = []
     if job_id not in user_favorites[username]:
         user_favorites[username].append(job_id)
@@ -386,7 +461,7 @@ async def career_path(career_data: CareerPathInput, current_user: dict = Depends
         "python": ["Junior Eco Engineer", "Senior Green Developer", "CTO Sustainability"],
         "design": ["Junior Designer", "Lead Architect", "Head of Green Design"],
         "data": ["Junior Analyst", "Senior Data Scientist", "Chief Climate Officer"]
-    }.get(career_data.current_skill.lower(), ["Specialist", "Expert", "Director"])
+    }.get(career_data.current_skill.lower(), ["Green Specialist", "Senior Expert", "Director"])
     
     salary_min, salary_max = ai_salary_predictor(career_data.current_skill, career_data.years_experience)
     
@@ -395,13 +470,19 @@ async def career_path(career_data: CareerPathInput, current_user: dict = Depends
         "years": career_data.years_experience,
         "career_path": path,
         "salary_projection": f"₹{salary_min}-{salary_max} LPA",
-        "company": "Tata Power Renewables"
+        "company": "Tata Power Renewables",
+        "sdg_impact": "Maximum contribution to 7 SDGs"
     }
+
+@app.post("/generate_cover_letter")  # v3.3: Cover Letter Generation
+async def generate_cover_letter(query: QueryInput, current_user: dict = Depends(get_current_user)):
+    cover_letter = f"Dear Hiring Manager,\nI am excited to apply for the {query.skill_text[0]} role at {next(iter(company_websites))}. With my experience in {query.skill_text[0]}, I can contribute to your green initiatives.\nBest,\n{current_user['username']}"
+    return {"cover_letter": cover_letter, "user": current_user["username"]}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
-    await websocket.send_text("🚀 Green Matchers v3.2 - AUTO-GEOLOCATION ACTIVE!")
+    await websocket.send_text("🚀 Green Matchers v3.3 - AUTO-GEOLOCATION ACTIVE!")
     await asyncio.sleep(2)
     await websocket.send_text('🚨 NEW: "Solar Engineer" - ₹12-20 LPA - 5km away!')
     try:
@@ -412,8 +493,7 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
 
 # Initialize
-print("✅ v3.2: AUTO-GEOLOCATION + DISTANCE + SALARY BOOST + INTERVIEW + RESUME LIVE!")
-print("🚀 SHIVAM = ₹7 LAKH CHAMPION!")
+init_db()
 
 if __name__ == "__main__":
     import uvicorn
