@@ -1,3 +1,4 @@
+markdown
 # 🌿 Green Matchers - AI Powered Career Platform
 
 > **Intelligent career matching for the modern workforce powered by AI**
@@ -21,22 +22,18 @@ Green Matchers uses advanced AI algorithms to:
 - 🌱 Focus on sustainable and green jobs
 
 ## 🏗️ System Architecture
-
 ┌─────────────────┐ ┌──────────────────┐ ┌─────────────────┐
-│ Frontend        │ │     Backend      │ │     Database    │
-│                 │ │                  │ │                 │
-│  React + Vite  │◄─►│ FastAPI + Python │◄─►│   MariaDB    │
-│                 | |                  | |                 |
-|   Tailwind CSS  │ │    OpenAI API    │ │  Green Jobs     │
+│ Frontend │ │ Backend │ │ Database │
+│ │ │ │ │ │
+│ React + Vite │◄──►│ FastAPI + Python│◄──►│ MariaDB │
+│ Tailwind CSS │ │ OpenAI API │ │ Green Jobs DB │
 └─────────────────┘ └──────────────────┘ └─────────────────┘
 
-
-
-
-
+text
 
 ## 🚀 Quick Start
- Prerequisites
+
+### Prerequisites
 - Node.js 16+
 - Python 3.8+
 - MariaDB Server
@@ -48,46 +45,53 @@ Green Matchers uses advanced AI algorithms to:
 ```bash
 git clone https://github.com/shivam-699/green-matchers-MariaDB-
 cd green-matchers-MariaDB-
-```
+Backend Setup (FastAPI)
 
-## Backend Setup (FastAPI)
+bash
 cd Backend
- Create and activate virtual environment
+
+# Create and activate virtual environment
 python -m venv .venv
 .venv\Scripts\activate  # Windows
- Install dependencies
+
+# Install dependencies
 pip install -r requirements.txt
- Start backend server
+
+# Start backend server
 uvicorn app:app --reload
 Backend runs at: http://localhost:8000
 API Docs: http://localhost:8000/docs
 
+Frontend Setup
 
-
-## Frontend Setup
+bash
 cd Frontend
 npm install
 npm run dev
 Frontend runs at: http://localhost:3000
 
-## 📊 Database Schema (MariaDB)
+📊 Database Schema (MariaDB)
 Your MariaDB database contains:
+
 51 companies in renewable energy sector
+
 24 green job listings with detailed descriptions
+
 4 users with skills and profiles
+
 Job demand data across Indian cities
+
 Favorites system for job tracking
 
-
-## 📁 Project Structure
+📁 Project Structure
+text
 green-matchers-MariaDB-/
 ├── 📂 Backend/
 │   ├── app.py                 # FastAPI main application
 │   ├── requirements.txt       # Python dependencies
 │   ├── .env                  # Environment variables
-│   ├── green_jobs.db         # SQLite database
-│   ├── career_visual.png     # Career visualization assets
-│   └── test_connection.py    # Database connection tests
+│   ├── test_connection.py    # Database connection tests
+│   └── test_db.py            # Database testing utilities
 ├── 📂 Frontend/
 │   ├── src/                  # React components & pages
 │   ├── package.json          # Frontend dependencies
@@ -97,65 +101,77 @@ green-matchers-MariaDB-/
 ├── 📜 README.md              # This file
 ├── 📜 LICENSE               # MIT License
 └── 📜 .gitignore            # Git ignore rules
-
-
-
-## 🔌 API Endpoints
-Method	    Endpoint        	  Description
-GET	         /career-paths	     Get all career paths
-POST	       /match-user	       Match user with careers
-GET	         /user/{id}	         Get user profile
-POST	       /analyze-skills	   AI skill analysis
-
-
-## 🛠️ Tech Stack
+🔌 API Endpoints
+Method	Endpoint	Description
+GET	/career-paths	Get all career paths
+POST	/match-user	Match user with careers
+GET	/user/{id}	Get user profile
+POST	/analyze-skills	AI skill analysis
+🛠️ Tech Stack
 Frontend: React, Vite, Tailwind CSS, Axios
+
 Backend: FastAPI, Python, Uvicorn, SQLAlchemy
+
 Database: MariaDB with 50+ companies & 24+ green jobs
+
 AI/ML: OpenAI GPT API
+
 Styling: Tailwind CSS, Responsive Design
+
 Tools: Git, GitHub, Postman
 
-
-## 🎯 Key Features
+🎯 Key Features
 ✅ AI-Powered Career Matching
+
 ✅ Real MariaDB Database with Real Data
+
 ✅ 50+ Green Energy Companies
+
 ✅ 24+ Detailed Job Listings
+
 ✅ User Profiles & Favorites System
+
 ✅ Responsive Web Interface
+
 ✅ RESTful API with Auto-docs
 
-
-## 📈 Data Highlights
+📈 Data Highlights
 51 Companies: Solar, Wind, Bio-energy sectors
+
 24 Green Jobs: From Junior to Executive levels
+
 Multiple Locations: Pan-India job opportunities
+
 SDG Alignment: All jobs mapped to UN Sustainable Development Goals
+
 Salary Data: Realistic compensation ranges
 
-
-## 👥 Team Members
+👥 Team Members
 Shivam - Full Stack Developer & Database Architect
-Sakthi Bala Sundaram -
-Nishani B -
-Neha RN -
-Nimalan -
 
+[Add Teammate 1] - Role
 
+[Add Teammate 2] - Role
 
-## 🎥 Live Demo
+🎥 Live Demo
 Frontend Application: http://localhost:3000
+
 Backend API Documentation: http://localhost:8000/docs
+
 Career Path Page: http://localhost:3000/career-path
 
-## 🔮 Future Enhancements
+🔮 Future Enhancements
 Advanced AI matching algorithms
+
 User authentication system
+
 Mobile application
+
 Real-time notifications
+
 Skill gap analysis
+
 Job application tracking
 
-## 📄 License
+📄 License
 MIT License - see LICENSE file for details
