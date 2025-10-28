@@ -35,11 +35,6 @@ Green Matchers uses advanced AI algorithms to:
 
 
 
-
-
-
-
-
 ## 🚀 Quick Start
  Prerequisites
 - Node.js 16+
