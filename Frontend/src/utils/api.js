@@ -53,3 +53,13 @@ export const generateResume = async (token, skills, location) => {
   });
   return response.data;
 };
+
+export const getSkillsTrends = async () => {
+  const response = await api.get('/trends/skills');
+  return response.data;
+};
+
+export const getCompaniesTrends = async () => {
+  const response = await api.get('/trends/companies');
+  return response.data;
+};
