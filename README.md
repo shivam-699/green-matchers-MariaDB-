@@ -32,8 +32,7 @@ Green Matchers uses advanced AI algorithms to:
 
 
 ## 🚀 Quick Start
-
-### Prerequisites
+ Prerequisites
 - Node.js 16+
 - Python 3.8+
 - MariaDB Server
@@ -49,12 +48,12 @@ cd green-matchers-MariaDB-
 
 ## Backend Setup (FastAPI)
 cd Backend
-# Create and activate virtual environment
+ Create and activate virtual environment
 python -m venv .venv
 .venv\Scripts\activate  # Windows
-# Install dependencies
+ Install dependencies
 pip install -r requirements.txt
-# Start backend server
+ Start backend server
 uvicorn app:app --reload
 Backend runs at: http://localhost:8000
 API Docs: http://localhost:8000/docs
