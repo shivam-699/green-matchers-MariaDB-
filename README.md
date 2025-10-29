@@ -103,25 +103,30 @@ Test Translation: POST /api/translate
 
 🎯 Unique Selling Points
 🇮🇳 India-First - Built for Indian job market with regional languages
-
 🌱 Green-Focused - Exclusive SDG-aligned career paths
-
 🤖 AI-Native - MariaDB vector search for intelligent matching
-
 🚀 Production Ready - Enterprise-grade authentication and security
+
+
+
+
 
 🏗️ System Architecture
 text
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+┌─────────────────┐    ┌──────────────────┐       ┌─────────────────┐
 │   Multi-Lingual  │    │   AI Backend      │    │   Vector Database │
 │     Frontend     │◄──►│   FastAPI +       │◄──►│   MariaDB with   │
 │  (10 Languages)  │    │   Python AI       │    │   Native Vectors │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+└─────────────────┘    └──────────────────┘      └─────────────────┘
          │                       │                       │
          │                       │                       │
          ▼                       ▼                       ▼
     Real-time              Semantic Search          Green Jobs
    Translation              Career Matching           Database
+
+
+
+   
 🎯 API Showcase (Try Now!)
 Career Matching
 json
