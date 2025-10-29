@@ -112,7 +112,7 @@ Test Translation: POST /api/translate
 
 
 🏗️ System Architecture
-```bash
+```
 │   Multi-Lingual  │    │   AI Backend      │    │   Vector Database │
 │     Frontend     │◄──►│   FastAPI +       │◄──►│   MariaDB with   │
 │  (10 Languages)  │    │   Python AI       │    │   Native Vectors │
@@ -127,7 +127,7 @@ Test Translation: POST /api/translate
 
    
 🎯 API Showcase (Try Now!)
-```bash
+```
 Career Matching
 json
 POST /api/career/recommendations
@@ -154,7 +154,7 @@ POST /api/translate
 ```
 
 📁 Project Structure
-```bash
+```
 green-matchers-MariaDB-/
 ├── 📂 Backend/
 │   ├── app.py 
@@ -180,86 +180,92 @@ green-matchers-MariaDB-/
 
 
 🔌 API Endpoints
+```
 Method	Endpoint	Description
 GET	/career-paths	Get all career paths
 POST	/match-user	Match user with careers
 GET	/user/{id}	Get user profile
 POST	/analyze-skills	AI skill analysis
-
+```
 
 🛠️ Tech Stack
+```
 Frontend: React, Vite, Tailwind CSS, Axios
 Backend: FastAPI, Python, Uvicorn, SQLAlchemy
 Database: MariaDB with 50+ companies & 24+ green jobs
 AI/ML: OpenAI GPT API
 Styling: Tailwind CSS, Responsive Design
 Tools: Git, GitHub, Postman
+```
 
 🎯 Key Features
+```
 ✅ AI-Powered Career Matching
-
 ✅ Real MariaDB Database with Real Data
-
 ✅ 50+ Green Energy Companies
-
 ✅ 24+ Detailed Job Listings
-
 ✅ User Profiles & Favorites System
-
 ✅ Responsive Web Interface
-
 ✅ RESTful API with Auto-docs
+```
 
 📈 Data Highlights
+```
 51 Companies: Solar, Wind, Bio-energy sectors
 24 Green Jobs: From Junior to Executive levels
 Multiple Locations: Pan-India job opportunities
 SDG Alignment: All jobs mapped to UN Sustainable Development Goals
 Salary Data: Realistic compensation ranges
-
+```
 
 🎯 What Makes Us Unique
+```
 MariaDB Vector Search - Using database-native AI operations
 10 Indian Languages - Beyond typical English-only platforms
 Green Economy Focus - SDG-aligned sustainable careers
 Real-time AI Matching - Live career recommendations
-
+```
 
 📈 Business Impact
+```
 Accessibility - Reaching 500M+ non-English speakers
 Sustainability - Driving green job adoption
 Technology - Cutting-edge AI with MariaDB vectors
 Scalability - Production-ready architecture
-
+```
 
 👥 Team Members
+```
 Shivam - Full Stack Developer & Database Architect
 
-[Add Teammate 1] - Role
+Sakthi Bala Sundaram - Role
 
-[Add Teammate 2] - Role
+Nishani B - Role
+
+Neha RN 
+
+Nimalan
+```
 
 🎥 Live Demo
+```
 Frontend Application: http://localhost:3000
 
 Backend API Documentation: http://localhost:8000/docs
 
 Career Path Page: http://localhost:3000/career-path
-
+```
 
 
 🔮 Future Enhancements
+```
 Advanced AI matching algorithms
-
 User authentication system
-
 Mobile application
-
 Real-time notifications
-
 Skill gap analysis
-
 Job application tracking
+```
 
 📄 License
 MIT License - see LICENSE file for details
