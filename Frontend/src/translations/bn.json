@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "হোম",
+    "jobs": "চাকরি",
+    "dashboard": "ড্যাশবোর্ড",
+    "trends": "ট্রেন্ডস",
+    "careerPath": "ক্যারিয়ার পথ",
+    "signIn": "সাইন ইন",
+    "logout": "লগআউট",
+    "premiumMember": "প্রিমিয়াম সদস্য"
+  },
+  "auth": {
+    "username": "ব্যবহারকারীর নাম",
+    "password": "পাসওয়ার্ড",
+    "login": "লগইন",
+    "register": "নিবন্ধন",
+    "email": "ইমেল",
+    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+    "createAccount": "অ্যাকাউন্ট তৈরি করুন"
+  },
+  "common": {
+    "search": "খুঁজুন",
+    "loading": "লোড হচ্ছে...",
+    "submit": "জমা দিন",
+    "cancel": "বাতিল",
+    "save": "সংরক্ষণ",
+    "delete": "মুছুন",
+    "apply": "আবেদন করুন",
+    "viewDetails": "বিস্তারিত দেখুন"
+  },
+  "job": {
+    "search": "চাকরি খোঁজা",
+    "location": "অবস্থান",
+    "salary": "বেতন",
+    "company": "কোম্পানি",
+    "jobTitle": "চাকরির শিরোনাম",
+    "description": "বিবরণ",
+    "skills": "দক্ষতা",
+    "experience": "অনুভব",
+    "applyNow": "এখনই আবেদন করুন",
+    "noJobs": "কোন চাকরি পাওয়া যায়নি"
+  },
+  "dashboard": {
+    "welcome": "স্বাগতম",
+    "profile": "প্রোফাইল",
+    "settings": "সেটিংস"
+  }
+}

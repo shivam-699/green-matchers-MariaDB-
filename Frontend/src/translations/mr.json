@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "होम",
+    "jobs": "नोकऱ्या",
+    "dashboard": "डॅशबोर्ड",
+    "trends": "ट्रेंड्स",
+    "careerPath": "करिअर मार्ग",
+    "signIn": "साइन इन",
+    "logout": "लॉगआउट",
+    "premiumMember": "प्रीमियम सदस्य"
+  },
+  "auth": {
+    "username": "वापरकर्तानाव",
+    "password": "पासवर्ड",
+    "login": "लॉगिन",
+    "register": "नोंदणी करा",
+    "email": "ईमेल",
+    "forgotPassword": "पासवर्ड विसरलात?",
+    "createAccount": "खाते तयार करा"
+  },
+  "common": {
+    "search": "शोधा",
+    "loading": "लोड होत आहे...",
+    "submit": "सबमिट करा",
+    "cancel": "रद्द करा",
+    "save": "जतन करा",
+    "delete": "हटवा",
+    "apply": "अर्ज करा",
+    "viewDetails": "तपशील पहा"
+  },
+  "job": {
+    "search": "नोकरी शोध",
+    "location": "स्थान",
+    "salary": "पगार",
+    "company": "कंपनी",
+    "jobTitle": "नोकरी शीर्षक",
+    "description": "वर्णन",
+    "skills": "कौशल्ये",
+    "experience": "अनुभव",
+    "applyNow": "आत्ताच अर्ज करा",
+    "noJobs": "नोकऱ्या सापडल्या नाहीत"
+  },
+  "dashboard": {
+    "welcome": "स्वागत आहे",
+    "profile": "प्रोफाइल",
+    "settings": "सेटिंग्ज"
+  }
+}

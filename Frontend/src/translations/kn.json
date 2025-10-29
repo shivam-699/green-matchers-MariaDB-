@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "ಹೋಮ್",
+    "jobs": "ಉದ್ಯೋಗಗಳು",
+    "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "trends": "ಟ್ರೆಂಡ್ಸ್",
+    "careerPath": "ವೃತ್ತಿ ಮಾರ್ಗ",
+    "signIn": "ಸೈನ್ ಇನ್",
+    "logout": "ಲಾಗ್ ಔಟ್",
+    "premiumMember": "ಪ್ರೀಮಿಯಂ ಸದಸ್ಯ"
+  },
+  "auth": {
+    "username": "ಬಳಕೆದಾರ ಹೆಸರು",
+    "password": "ಪಾಸ್ವರ್ಡ್",
+    "login": "ಲಾಗಿನ್",
+    "register": "ನೋಂದಣಿ",
+    "email": "ಇಮೇಲ್",
+    "forgotPassword": "ಪಾಸ್ವರ್ಡ್ ಮರೆತಿರಾ?",
+    "createAccount": "ಖಾತೆ ತೆರೆಯಿರಿ"
+  },
+  "common": {
+    "search": "ಹುಡುಕಿ",
+    "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    "submit": "ಸಲ್ಲಿಸು",
+    "cancel": "ರದ್ದು ಮಾಡಿ",
+    "save": "ಉಳಿಸಿ",
+    "delete": "ಅಳಿಸಿ",
+    "apply": "ಅನ್ವಯಿಸು",
+    "viewDetails": "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ"
+  },
+  "job": {
+    "search": "ಉದ್ಯೋಗ ಹುಡುಕಾಟ",
+    "location": "ಸ್ಥಳ",
+    "salary": "ಸಂಬಳ",
+    "company": "ಕಂಪನಿ",
+    "jobTitle": "ಉದ್ಯೋಗ ಶೀರ್ಷಿಕೆ",
+    "description": "ವಿವರಣೆ",
+    "skills": "ಕೌಶಲ್ಯಗಳು",
+    "experience": "ಅನುಭವ",
+    "applyNow": "ಈಗಲೇ ಅನ್ವಯಿಸು",
+    "noJobs": "ಉದ್ಯೋಗಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+  },
+  "dashboard": {
+    "welcome": "ಸ್ವಾಗತ",
+    "profile": "ಪ್ರೊಫೈಲ್",
+    "settings": "ಸೆಟ್ಟಿಂಗ್ಸ್"
+  }
+}

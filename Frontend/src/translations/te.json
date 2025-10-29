@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "హోమ్",
+    "jobs": "ఉద్యోగాలు",
+    "dashboard": "డాష్బోర్డ్",
+    "trends": "ట్రెండ్స్",
+    "careerPath": "కెరీర్ పాత్",
+    "signIn": "సైన్ ఇన్",
+    "logout": "లాగ్అవుట్",
+    "premiumMember": "ప్రీమియం సభ్యుడు"
+  },
+  "auth": {
+    "username": "వినియోగదారు పేరు",
+    "password": "పాస్వర్డ్",
+    "login": "లాగిన్",
+    "register": "నమోదు చేసుకోండి",
+    "email": "ఇమెయిల్",
+    "forgotPassword": "పాస్వర్డ్ మర్చిపోయారా?",
+    "createAccount": "ఖాతా సృష్టించు"
+  },
+  "common": {
+    "search": "వెతకండి",
+    "loading": "లోడ్ అవుతోంది...",
+    "submit": "సమర్పించండి",
+    "cancel": "రద్దు చేయండి",
+    "save": "సేవ్ చేయండి",
+    "delete": "తొలగించు",
+    "apply": "దరఖాస్తు చేయండి",
+    "viewDetails": "వివరాలు చూడండి"
+  },
+  "job": {
+    "search": "ఉద్యోగ శోధన",
+    "location": "స్థానం",
+    "salary": "జీతం",
+    "company": "కంపెనీ",
+    "jobTitle": "ఉద్యోగ శీర్షిక",
+    "description": "వివరణ",
+    "skills": "నైపుణ్యాలు",
+    "experience": "అనుభవం",
+    "applyNow": "ఇప్పుడే దరఖాస్తు చేయండి",
+    "noJobs": "ఉద్యోగాలు లేవు"
+  },
+  "dashboard": {
+    "welcome": "స్వాగతం",
+    "profile": "ప్రొఫైల్",
+    "settings": "సెట్టింగ్లు"
+  }
+}

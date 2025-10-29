@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "હોમ",
+    "jobs": "નોકરીઓ",
+    "dashboard": "ડેશબોર્ડ",
+    "trends": "ટ્રેન્ડ્સ",
+    "careerPath": "કેરિયર પાથ",
+    "signIn": "સાઇન ઇન",
+    "logout": "લોગઆઉટ",
+    "premiumMember": "પ્રીમિયમ સભ્ય"
+  },
+  "auth": {
+    "username": "યુઝરનેઈમ",
+    "password": "પાસવર્ડ",
+    "login": "લૉગિન",
+    "register": "રજિસ્ટર",
+    "email": "ઈમેલ",
+    "forgotPassword": "પાસવર્ડ ભૂલી ગયા?",
+    "createAccount": "એકાઉન્ટ બનાવો"
+  },
+  "common": {
+    "search": "શોધો",
+    "loading": "લોડ થાય છે...",
+    "submit": "સબમિટ કરો",
+    "cancel": "કેન્સલ કરો",
+    "save": "સેવ કરો",
+    "delete": "કાઢી નાખો",
+    "apply": "અપ્લાય કરો",
+    "viewDetails": "વિગતો જુઓ"
+  },
+  "job": {
+    "search": "નોકરી શોધ",
+    "location": "લોકેશન",
+    "salary": "સેલરી",
+    "company": "કંપની",
+    "jobTitle": "નોકરી શીર્ષક",
+    "description": "વર્ણન",
+    "skills": "સ્કિલ્સ",
+    "experience": "અનુભવ",
+    "applyNow": "હમણાં અરજી કરો",
+    "noJobs": "નોકરીઓ નથી મળી"
+  },
+  "dashboard": {
+    "welcome": "સ્વાગત છે",
+    "profile": "પ્રોફાઇલ",
+    "settings": "સેટિંગ્સ"
+  }
+}

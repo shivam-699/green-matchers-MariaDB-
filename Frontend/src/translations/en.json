@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "Home",
+    "jobs": "Jobs",
+    "dashboard": "Dashboard",
+    "trends": "Trends",
+    "careerPath": "Career Path",
+    "signIn": "Sign In",
+    "logout": "Logout",
+    "premiumMember": "Premium Member"
+  },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "forgotPassword": "Forgot Password?",
+    "createAccount": "Create Account"
+  },
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "apply": "Apply",
+    "viewDetails": "View Details"
+  },
+  "job": {
+    "search": "Job Search",
+    "location": "Location",
+    "salary": "Salary",
+    "company": "Company",
+    "jobTitle": "Job Title",
+    "description": "Description",
+    "skills": "Skills",
+    "experience": "Experience",
+    "applyNow": "Apply Now",
+    "noJobs": "No jobs found"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "profile": "Profile",
+    "settings": "Settings"
+  }
+}

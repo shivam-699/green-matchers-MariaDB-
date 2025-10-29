@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "ହୋମ୍",
+    "jobs": "ଚାକିରି",
+    "dashboard": "ଡ୍ୟାସବୋର୍ଡ",
+    "trends": "ଟ୍ରେଣ୍ଡସ୍",
+    "careerPath": "କ୍ୟାରିଅର ପାଥ",
+    "signIn": "ସାଇନ୍ ଇନ୍",
+    "logout": "ଲଗଆଉଟ୍",
+    "premiumMember": "ପ୍ରିମିୟମ୍ ସଦସ୍ୟ"
+  },
+  "auth": {
+    "username": "ଉପଯୋଗକର୍ତ୍ତା ନାମ",
+    "password": "ପାସୱାର୍ଡ",
+    "login": "ଲଗଇନ୍",
+    "register": "ରେଜିଷ୍ଟର୍",
+    "email": "ଇମେଲ୍",
+    "forgotPassword": "ପାସୱାର୍ଡ ଭୁଲି ଗଲେ?",
+    "createAccount": "ଆକାଉଣ୍ଟ ଖୋଲନ୍ତୁ"
+  },
+  "common": {
+    "search": "ସନ୍ଧାନ କରନ୍ତୁ",
+    "loading": "ଲୋଡ୍ ହେଉଛି...",
+    "submit": "ଦାଖଲ କରନ୍ତୁ",
+    "cancel": "ବାତିଲ୍ କରନ୍ତୁ",
+    "save": "ସେଭ୍ କରନ୍ତୁ",
+    "delete": "ଡିଲିଟ୍ କରନ୍ତୁ",
+    "apply": "ଆବେଦନ କରନ୍ତୁ",
+    "viewDetails": "ବିବରଣୀ ଦେଖନ୍ତୁ"
+  },
+  "job": {
+    "search": "ଚାକିରି ଖୋଜ",
+    "location": "ଅବସ୍ଥାନ",
+    "salary": "ଦରମା",
+    "company": "କମ୍ପାନୀ",
+    "jobTitle": "ଚାକିରି ଶୀର୍ଷକ",
+    "description": "ବର୍ଣ୍ଣନା",
+    "skills": "ଦକ୍ଷତା",
+    "experience": "ଅନୁଭବ",
+    "applyNow": "ବର୍ତ୍ତମାନ ଆବେଦନ କରନ୍ତୁ",
+    "noJobs": "କୌଣସି ଚାକିରି ମିଳିଲା ନାହିଁ"
+  },
+  "dashboard": {
+    "welcome": "ସ୍ୱାଗତ",
+    "profile": "ପ୍ରୋଫାଇଲ୍",
+    "settings": "ସେଟିଂସ୍"
+  }
+}
