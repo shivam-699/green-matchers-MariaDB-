@@ -127,6 +127,7 @@ Test Translation: POST /api/translate
 
    
 🎯 API Showcase (Try Now!)
+```bash
 Career Matching
 json
 POST /api/career/recommendations
@@ -150,9 +151,10 @@ POST /api/translate
   "text": "Solar Energy Engineer",
   "target_lang": "bn"  // Bengali output!
 }
+```
 
 📁 Project Structure
-text
+```bash
 green-matchers-MariaDB-/
 ├── 📂 Backend/
 │   ├── app.py 
@@ -173,7 +175,7 @@ green-matchers-MariaDB-/
 ├── 📜 README.md              # This file
 ├── 📜 LICENSE               # MIT License
 └── 📜 .gitignore            # Git ignore rules
-
+```
 
 
 
