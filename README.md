@@ -96,13 +96,9 @@ Test Translation: POST /api/translate
 🔥 HACKATHON HIGHLIGHTS
 📊 Impressive Metrics
 48 Careers vectorized with AI embeddings
-
 24 Green Jobs with real company data
-
 10 Languages supported instantly
-
 95%+ Accuracy in career matching
-
 <1 second response time for AI queries
 
 🎯 Unique Selling Points
