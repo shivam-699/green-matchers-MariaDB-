@@ -112,7 +112,7 @@ Test Translation: POST /api/translate
 
 
 🏗️ System Architecture
-
+```bash
 │   Multi-Lingual  │    │   AI Backend      │    │   Vector Database │
 │     Frontend     │◄──►│   FastAPI +       │◄──►│   MariaDB with   │
 │  (10 Languages)  │    │   Python AI       │    │   Native Vectors │
@@ -122,7 +122,7 @@ Test Translation: POST /api/translate
          ▼                       ▼                       ▼
     Real-time              Semantic Search          Green Jobs
    Translation              Career Matching           Database
-
+```
 
 
    
