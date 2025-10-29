@@ -94,7 +94,7 @@ Get Careers: POST /api/career/recommendations
 Search Jobs: POST /api/jobs/search
 
 Test Translation: POST /api/translate
-
+```
 🔥 HACKATHON HIGHLIGHTS
 📊 Impressive Metrics
 48 Careers vectorized with AI embeddings
