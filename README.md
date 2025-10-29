@@ -1,6 +1,6 @@
 # 🌱 Green Matchers - AI-Powered Green Jobs Platform
 
-**🏆 HACKATHON READY: Complete AI-powered career matching with 10 Indian languages & real-time job search**
+**Complete AI-powered career matching with 10 Indian languages & real-time job search**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb)](https://mariadb.org)
