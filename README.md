@@ -8,8 +8,6 @@
 [![AI Powered](https://img.shields.io/badge/AI-Powered-orange)]()
 [![Multi-Language](https://img.shields.io/badge/10-Languages-green)]()
 
-## 🏆 Hackathon Achievement
-**✅ PHASE 1 COMPLETED: Fully Functional AI-Powered Platform**
 
 ## 🎯 Problem Statement
 Traditional career platforms fail to provide personalized, AI-driven career paths in regional languages, especially for India's growing green economy sector.
