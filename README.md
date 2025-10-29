@@ -94,19 +94,21 @@ Search Jobs: POST /api/jobs/search
 Test Translation: POST /api/translate
 ```
 🔥 HACKATHON HIGHLIGHTS
+```
 📊 Impressive Metrics
 48 Careers vectorized with AI embeddings
 24 Green Jobs with real company data
 10 Languages supported instantly
 95%+ Accuracy in career matching
 <1 second response time for AI queries
-
+```
 🎯 Unique Selling Points
+```
 🇮🇳 India-First - Built for Indian job market with regional languages
 🌱 Green-Focused - Exclusive SDG-aligned career paths
 🤖 AI-Native - MariaDB vector search for intelligent matching
 🚀 Production Ready - Enterprise-grade authentication and security
-
+```
 
 
 
